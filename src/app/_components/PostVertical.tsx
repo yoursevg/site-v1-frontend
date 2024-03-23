@@ -11,7 +11,8 @@ function PostVertical({post, index}:{post:any, index:any}) {
 
     return (
         <Link href={`/posts?postId=${post.id}`}> <Card
-            className="rounded-xl w-[300px] h-[400px]" key={index}>
+            className="rounded-xl w-[300px] h-[400px]
+            transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50" key={index}>
             <CardContent className="flex justify-between px-0">
                 <div className="flex flex-col w-full">
                     <div className="w-full h-48 relative">

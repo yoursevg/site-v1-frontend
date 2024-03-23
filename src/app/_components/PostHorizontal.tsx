@@ -1,12 +1,23 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import Image from "next/image";
 import {Calendar, Heart, MapPin, Star} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import Link from "next/link";
 import {useTimeAgo} from "next-timeago";
+import {useUser} from "@clerk/clerk-react";
+import GlobalApi from "@/app/_utils/GlobalApi";
 
 function PostHorizontal({post, index}:{post:any, index:any}) {
+
+    const {isSignedIn, isLoaded, user} = useUser()
+    const [liked, setLiked] = useState(false)
+
+    useEffect(() => {
+        if (user && post.attributes.users_favorites?.data[0]?.attributes.username === user?.username) {
+            setLiked(true)
+        }
+    }, [user])
 
     const {TimeAgo} = useTimeAgo()
 
@@ -25,13 +36,26 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
             <div className="flex">
                 {stars}
             </div>
-        );
+        )
     }
 
+    const handleHeartClick = async (postId: number, userId: string | undefined) => {
+        try {
+            const result = await GlobalApi.updateFavoritesByUserAndPostId(postId, userId);
+            console.log(result);
+            setLiked(!liked); // Переключаем состояние только после успешного ответа
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
+    if (!isLoaded) {
+        return <div>Loading...</div>
+    }
 
     return (
-        <Link href={`/posts?postId=${post.id}`}> <Card className="w-full rounded-xl h-[200px]" key={index}>
+        <Card className="w-full rounded-xl h-[200px]
+        transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50" key={index}>
             <CardContent className="flex justify-between px-0 h-full">
                 <div className="flex h-full">
                     <div className="h-full relative w-64">
@@ -40,23 +64,24 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                                objectFit="cover" layout="fill"/>
                     </div>
                     <div className="ml-3">
-                        <CardTitle className="my-4">{post.attributes.title}</CardTitle>
+                        <Link href={`/posts?postId=${post.id}`}>
+                            <CardTitle className="my-4">{post.attributes.title}</CardTitle>
+                        </Link>
                         <div className="flex flex-col gap-3">
-                                                <span
-                                                    className="font-bold text-black text-lg">{post.attributes.price}₽</span>
+                            <span className="font-bold text-black text-lg">{post.attributes.price}₽</span>
                             <p>{post.attributes.stock} шт. в наличии</p>
                             <div className="flex items-center">
                                 <MapPin size={15}/> {post.attributes.location}
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar size={15}/> <TimeAgo date={post.attributes.createdAt}
-                                                               locale='ru'/>
+                                <Calendar size={15}/> <TimeAgo date={post.attributes.createdAt} locale='ru'/>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-between p-5">
-                    <Heart className="cursor-pointer hover:fill-black"/>
+                    <Heart className={`cursor-pointer ${liked && "fill-black"}`}
+                           onClick={() => handleHeartClick(post.id, user?.id)}/>
                     <div className="flex gap-2 items-center">
                         <Avatar className="border">
                             <AvatarImage src={post.attributes.author.data.attributes.profile_image_url}/>
@@ -73,7 +98,7 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                                 <span className="text-sm">13300</span>
                             </div>
                             <span className="text-sm">
-                                зарегистрирован:
+                                зарегистрирован:{"\n"}
                                 <TimeAgo date={post.attributes.author.data.attributes.createdAt}
                                          locale='ru'/>
                             </span>
@@ -82,7 +107,6 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                 </div>
             </CardContent>
         </Card>
-        </Link>
     );
 }
 

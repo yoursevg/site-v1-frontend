@@ -13,17 +13,13 @@ import {
 } from "@/components/ui/select";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {AlignLeft, LayoutGrid, MapPin, Star} from "lucide-react";
+import {AlignLeft, LayoutGrid, MapPin} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import GlobalApi from "@/app/_utils/GlobalApi";
-import { useTimeAgo } from 'next-timeago';
 import PostHorizontal from "@/app/_components/PostHorizontal";
 import PostVertical from "@/app/_components/PostVertical";
 
-
 function Home() {
-
-    const {TimeAgo} = useTimeAgo()
 
     const [categories, setCategories] = useState([])
     const [posts, setPosts] = useState([])
@@ -45,24 +41,6 @@ function Home() {
         });
     };
 
-    const StarRating = ({rating}: {rating:number}) => {
-        const stars = [];
-
-        for (let i = 1; i <= 5; i++) {
-            if (i <= Math.round(rating)) {
-                stars.push(<Star size={12} className="fill-black"/>)
-            } else {
-                stars.push(<Star size={12} />)
-            }
-        }
-
-        return (
-            <div className="flex">
-                {stars}
-            </div>
-        );
-    }
-
     return (
         <div>
             <Tabs defaultValue="lines" className="">
@@ -82,7 +60,7 @@ function Home() {
                         }) :
                         [1, 2, 3, 4, 5, 6].map((item, index) => (
                             <div className='h-[144px] w-[148px] mx-4 bg-slate-200
-            rounded-lg animate-pulse'></div>
+            rounded-lg animate-pulse' key={index}></div>
                         ))
                     }
                 </div>
@@ -142,7 +120,7 @@ function Home() {
                             return <PostHorizontal post={post} index={index}/>
                         }) : [1, 2, 3].map((item, index) => (
                             <div className='h-[200px] w-full bg-slate-200
-            rounded-lg animate-pulse'></div>))}
+            rounded-lg animate-pulse' key={index}></div>))}
                     </div>
                 </TabsContent>
                 <TabsContent value="grid">
