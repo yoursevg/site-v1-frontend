@@ -56,13 +56,10 @@ function Sidebar() {
             </div>
             <Separator/>
             <div className="flex flex-col gap-3">
-                <Link href="/announcements">
+                <Link href="/profile/management">
                     Управление профилем
                 </Link>
-                <Link href="/reviews">
-                    Защита профиля
-                </Link>
-                <Link href="/favourites">
+                <Link href="/profile/settings">
                     Настройки
                 </Link>
             </div>
