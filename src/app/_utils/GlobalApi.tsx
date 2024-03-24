@@ -22,18 +22,30 @@ const getFavoritesPostsByUserId = (userId: string | null | undefined) => axiosCl
     .get(`posts?populate=*&filters[users_favorites][identificator][$eq]=${userId}`)
     .catch(error => console.error('Ошибка при получении объявлений:', error))
 
-const updateFavoritesByUserAndPostId = async (postId: number, userId: string | null | undefined) => {
+const updateFavoritesByUserAndPostId = async (postId: number, userIdentificator: string | null | undefined) => {
     try {
-        const res = await axiosClient.get(`posts/${postId}?populate=users_favorites`);
-        console.log(res)
+        const usersResponse = await axiosClient.get(`/users?filters[identificator][$eq]=${userIdentificator}`);
+        console.log(usersResponse)
+        const userId = usersResponse.data.length > 0 ? usersResponse.data[0].id : null;
+        if (!userId) {
+            console.log('Пользователь не найден');
+            return;
+        }
+
+        const res = await axiosClient.get(`/posts/${postId}?populate=users_favorites`);
         const currentFavorites = res.data.data.attributes.users_favorites.data;
 
-        // Удаляем пользователя из списка
-        const updatedFavorites = currentFavorites
-            .filter((user: { attributes: { identificator: string | null | undefined; }; }) => {
-                return user.attributes.identificator !== userId
-            });
-        console.log(updatedFavorites)
+        const isFavorite = currentFavorites.some((user: { id: any; }) => user.id === userId);
+
+        let updatedFavorites;
+        if (isFavorite) {
+            // Если пользователь уже в избранном, удаляем его
+            updatedFavorites = currentFavorites.filter((user: { id: any; }) => user.id !== userId);
+        } else {
+            // Если пользователя нет в избранном, добавляем его
+            updatedFavorites = [...currentFavorites, {id: userId}];
+        }
+
         // Обновляем пост с новым списком избранных
         const updateResponse = await axiosClient.put(`/posts/${postId}`, {
             data: {
@@ -41,11 +53,12 @@ const updateFavoritesByUserAndPostId = async (postId: number, userId: string | n
             },
         });
 
-        console.log('Объявление удалено из избранных', updateResponse);
+        console.log('Изменения в избранных сохранены', updateResponse);
     } catch (error) {
-        console.error('Ошибка при обновлении объявления:', error);
+        console.error('Ошибка при обновлении списка избранных:', error);
     }
 };
+
 
 export default {
     getPosts,
