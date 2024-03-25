@@ -7,6 +7,7 @@ import Link from "next/link";
 import {useTimeAgo} from "next-timeago";
 import {useUser} from "@clerk/clerk-react";
 import GlobalApi from "@/app/_utils/GlobalApi";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 function PostHorizontal({post, index}:{post:any, index:any}) {
 
@@ -14,10 +15,12 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
     const [liked, setLiked] = useState(false)
 
     useEffect(() => {
-        if (user && post.attributes.users_favorites?.data[0]?.attributes.username === user?.username) {
+        setLiked(false)
+        if (user && post.attributes.users_favorites?.data[0]?.attributes.identificator === user?.id) {
             setLiked(true)
         }
-    }, [user])
+        console.log(post)
+    }, [user, post])
 
     const {TimeAgo} = useTimeAgo()
 
@@ -49,6 +52,10 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
         }
     };
 
+    const truncateTitle = (title: string) => {
+        return title.length > 25 ? title.substring(0, 25) + '...' : title;
+    };
+
     if (!isLoaded) {
         return <div>Loading...</div>
     }
@@ -60,12 +67,23 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                 <div className="flex h-full">
                     <div className="h-full relative w-64">
                         <Image className="rounded-l-xl"
-                               src={post.attributes.images.data[0].attributes.url} alt="photo"
+                               src={post.attributes.images?.data[0]?.attributes.url} alt="photo"
                                objectFit="cover" layout="fill"/>
                     </div>
                     <div className="ml-3">
                         <Link href={`/posts?postId=${post.id}`}>
-                            <CardTitle className="my-4">{post.attributes.title}</CardTitle>
+                            <CardTitle className="my-4 w-[350px]">
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            {truncateTitle(post.attributes.title)}
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{post.attributes.title}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </CardTitle>
                         </Link>
                         <div className="flex flex-col gap-3">
                             <span className="font-bold text-black text-lg">{post.attributes.price}₽</span>

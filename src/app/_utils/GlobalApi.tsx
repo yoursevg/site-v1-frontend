@@ -21,6 +21,78 @@ const getPostsByUserId = (userId: string | null | undefined) => axiosClient
 const getFavoritesPostsByUserId = (userId: string | null | undefined) => axiosClient
     .get(`posts?populate=*&filters[users_favorites][identificator][$eq]=${userId}`)
     .catch(error => console.error('Ошибка при получении объявлений:', error))
+const getPostsBySearch = async (searchReq: string | null | undefined) => {
+    if (searchReq === "") {
+        await getPosts().then((res) => {
+            return res.data
+        })
+    } else {
+        try {
+            const query = `
+      query SearchPosts($searchTerm: String!) {
+        search(query: $searchTerm) {
+          posts {
+            data {
+              id
+              attributes {
+                title
+                createdAt
+                price
+                stock
+                location
+                description
+                condition
+                author {
+                  data {
+                    attributes {
+                      username
+                      first_name
+                      last_name
+                      createdAt
+                      identificator
+                      profile_image_url
+                    }
+                  }
+                }
+                images {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+                users_favorites {
+                  data {
+                    attributes {
+                      identificator
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+            const variables = {
+                searchTerm: searchReq,
+            };
+
+            const response = await axiosClient.post('/graphql', {
+                query,
+                variables,
+            }, {
+                baseURL: "http://localhost:1337"
+            });
+
+            return response.data.data.search.posts;
+        } catch (error) {
+            console.error('Ошибка при попытке поиска объявлений:', error);
+        }
+    }
+};
 
 const updateFavoritesByUserAndPostId = async (postId: number, userIdentificator: string | null | undefined) => {
     try {
@@ -65,5 +137,6 @@ export default {
     getCategories,
     getPostsByUserId,
     getFavoritesPostsByUserId,
+    getPostsBySearch,
     updateFavoritesByUserAndPostId
 }

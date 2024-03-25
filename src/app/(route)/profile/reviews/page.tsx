@@ -1,5 +1,5 @@
 import React from 'react';
-import {CardTitle} from "@/components/ui/card";
+import {CardContent, CardDescription, CardTitle} from "@/components/ui/card";
 
 function Reviews() {
     return (
@@ -7,6 +7,11 @@ function Reviews() {
             <CardTitle>
                 Мои отзывы
             </CardTitle>
+            <CardContent>
+                <CardDescription>
+                    Здесь будут ваши отзывы
+                </CardDescription>
+            </CardContent>
         </div>
     );
 }

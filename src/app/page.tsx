@@ -23,6 +23,7 @@ function Home() {
 
     const [categories, setCategories] = useState([])
     const [posts, setPosts] = useState([])
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         getCategoriesList()
@@ -39,6 +40,17 @@ function Home() {
         GlobalApi.getCategories().then((res) => {
             setCategories(res.data.data)
         });
+    };
+
+    const handleSearch = async (event: { preventDefault: () => void; }) => {
+        event.preventDefault(); // Prevent the form from reloading the page
+        try {
+            const res = await GlobalApi.getPostsBySearch(searchTerm)
+            console.log(res)
+            setPosts(res.data)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     return (
@@ -67,17 +79,17 @@ function Home() {
                 <div className="flex my-4 justify-between flex-wrap">
                     <div className="flex gap-3">
                         <Select>
-                            <SelectTrigger className="w-[100px]">
+                            <SelectTrigger className="w-[80px]">
                                 <SelectValue placeholder="Тип"/>
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Тип</SelectLabel>
-                                    <SelectItem value="apple">Apple</SelectItem>
-                                    <SelectItem value="banana">Banana</SelectItem>
-                                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                                    <SelectItem value="grapes">Grapes</SelectItem>
-                                    <SelectItem value="pineapple">Pineapple</SelectItem>
+                                    {categories.length > 0 && categories.map((category, index) => {
+                                        return <SelectItem value={category.attributes.name} key={index}>
+                                            {category.attributes.name}
+                                        </SelectItem>
+                                    })}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
@@ -97,16 +109,21 @@ function Home() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="flex w-full max-w-2xl items-center space-x-2">
-                        <Input type="email" placeholder="Поиск по объявлениям"/>
-                        <Button type="submit">Найти</Button>
+                    <form onSubmit={handleSearch} className="flex w-full max-w-2xl items-center space-x-2">
+                            <Input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Поиск по объявлениям"
+                            />
+                            <Button type="submit">Найти</Button>
                         <div className="flex items-center h-full p-1 border-hidden cursor-pointer
-                     transition ease-linear
-                     hover:bg-sky-200 rounded-xl">
+                                transition ease-linear
+                                hover:bg-sky-200 rounded-xl">
                             <MapPin size={20}/>
                             <span className="text-sm">Москва</span>
                         </div>
-                    </div>
+                    </form>
                     <div className="flex items-center gap-3">
                         <TabsList>
                             <TabsTrigger value="lines"><AlignLeft/></TabsTrigger>
