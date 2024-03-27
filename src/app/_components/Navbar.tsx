@@ -1,8 +1,6 @@
 "use client"
-
-import React, {useEffect} from 'react';
-import Image from "next/image";
-import {Button} from "@/components/ui/button";
+import React from 'react';
+import {Button, buttonVariants} from "@/components/ui/button";
 import Link from "next/link";
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
@@ -13,15 +11,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {ClerkLoaded, ClerkLoading, SignedIn, SignedOut, UserButton} from "@clerk/nextjs";
-import { Loader } from 'rsuite';
 
 function Navbar() {
     const { setTheme } = useTheme()
-
-    // const {user} = useKindeBrowserClient()
-    // useEffect(() => {
-    //     console.log(user)
-    // }, [user]);
 
     const Menu = [
         {
@@ -44,16 +36,16 @@ function Navbar() {
     return (
         <div className='flex items-center
     justify-between p-4 shadow-sm md:px-20 sm:px-10 mb-7'>
-            <div className='flex items-center gap-10'>
-                <Image src='/logo.svg' alt='logo'
-                       width={180} height={80}
-                />
-                <ul className='md:flex gap-8 hidden'>
+            <div className='flex items-center gap-3'>
+                <Link href="/">
+                    <div className="bg-[url('/logo.svg')] dark:bg-[url('/logoblack.svg')]
+                     bg-contain bg-no-repeat w-[180px] h-[40px]"></div>
+                </Link>
+                <ul className='md:flex gap-8 hidden '>
                     {Menu.slice(0,3).map((item, index) => (
-                        <Link href={item.path} key={index}>
+                        <Link href={item.path} key={index} className={buttonVariants({ variant: "ghost" })}>
                             <li className='hover:text-primary
-                    cursor-pointer hover:scale-105
-                    transition-all ease-in-out'>{item.name}</li>
+                    cursor-pointer transition-all ease-in-out text-md scale-110'>{item.name}</li>
                         </Link>
                     ))}
                 </ul>
@@ -84,12 +76,19 @@ function Navbar() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </li>
-                    <SignedIn>
-                        <Link href="/profile">
-                            <li className="hover:text-primary
-                    cursor-pointer hover:scale-105 transition-all ease-in-out">Профиль</li>
-                        </Link>
-                    </SignedIn>
+                    <ClerkLoaded>
+                        <SignedIn>
+                            <Link href="/profile" className={buttonVariants({ variant: "ghost" })}>
+                                <li className="hover:text-primary
+                        cursor-pointer transition-all ease-in-out text-md scale-110">Профиль</li>
+                            </Link>
+                            <Link href="/posts/create" className={buttonVariants({ variant: "default" })}>
+                                <li className="cursor-pointer transition-all ease-in-out text-md scale-105">
+                                    Разместить объявление
+                                </li>
+                            </Link>
+                        </SignedIn>
+                    </ClerkLoaded>
                     <li className="flex items-center">
                         <ClerkLoading>
                             <span>Загрузка...</span>

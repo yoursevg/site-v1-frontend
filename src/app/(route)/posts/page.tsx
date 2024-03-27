@@ -5,6 +5,7 @@ import {useSearchParams} from "next/navigation";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import Image from "next/image"
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
+import GlobalApi from "@/app/_utils/GlobalApi";
 
 function Post() {
     const [postData, setPostData] = useState(null);
@@ -14,15 +15,11 @@ function Post() {
     const id = searchParams.get("postId")
 
     useEffect(() => {
-
-        const fetchData = async () => {
-            const response = await fetch(`http://localhost:1337/api/posts/${id}?populate=*`);
-            const data = await response.json();
-            setPostData(data.data.attributes);
-            setImageUrl(data.data.attributes.images.data[0].attributes.url)
-        };
         if (id) {
-            fetchData();
+            GlobalApi.getPostByPostId(id).then((res) => {
+                setPostData(res?.data.data.attributes);
+                setImageUrl(res?.data.data.attributes?.images.data[0].attributes.url)
+            })
         }
     }, []);
 
@@ -36,28 +33,22 @@ function Post() {
     return (
         <Card className="px-3 py-8">
             <CardHeader className="pt-0">
-                <CardTitle>{postData.title}</CardTitle>
+                <CardTitle>{postData?.title}</CardTitle>
             </CardHeader>
             <CardContent className="flex justify-between">
                 <div className="flex flex-col gap-3">
                     <div className="photos flex flex-col gap-2">
-                        <Image
-                            src={imageUrl}
+                        <Image src={imageUrl}
                             width={600}
                             height={500}
                             alt="photo"
-                            className="rounded-3xl"
-                        />
-
+                            className="rounded-3xl"/>
                         <div className="flex px-8">
-                            <Carousel
-                                opts={{
+                            <Carousel opts={{
                                     align: "start",
-                                }}
-                                className="w-full max-w-sm"
-                            >
+                                }} className="w-full max-w-sm">
                                 <CarouselContent className="items-center">
-                                    {postData.images.data.map((img:any, index:any) => (
+                                    {postData?.images.data.map((img:any, index:any) => (
                                         <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
                                             <div className="px-0">
                                                 <Card className="cursor-pointer">

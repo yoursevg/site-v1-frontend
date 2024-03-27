@@ -12,20 +12,25 @@ const axiosClient = axios.create({
 const getPosts = () =>axiosClient
     .get("posts?populate=*&sort=id")
     .catch(error => console.error('Ошибка при получении объявлений:', error))
+const getPostByPostId = (postId: string | null | undefined) => axiosClient
+    .get(`posts/${postId}?populate=*`)
+    .catch(error => console.error('Ошибка при получении объявления:', error))
+
 const getCategories = () => axiosClient
     .get("categories?populate=*&sort=id")
     .catch(error => console.error('Ошибка при получении категорий:', error))
 const getPostsByUserId = (userId: string | null | undefined) => axiosClient
     .get(`posts?populate=*&filters[author][identificator][$eq]=${userId}`)
     .catch(error => console.error('Ошибка при получении объявлений:', error))
+const getPostsByCategory = (categoryName: string | null | undefined) => axiosClient
+    .get(`posts?populate=*&filters[category][name][$eq]=${categoryName}`)
+    .catch(error => console.error('Ошибка при получении объявлений:', error))
 const getFavoritesPostsByUserId = (userId: string | null | undefined) => axiosClient
     .get(`posts?populate=*&filters[users_favorites][identificator][$eq]=${userId}`)
     .catch(error => console.error('Ошибка при получении объявлений:', error))
 const getPostsBySearch = async (searchReq: string | null | undefined) => {
     if (searchReq === "") {
-        await getPosts().then((res) => {
-            return res.data
-        })
+        return getPosts()
     } else {
         try {
             const query = `
@@ -42,6 +47,13 @@ const getPostsBySearch = async (searchReq: string | null | undefined) => {
                 location
                 description
                 condition
+                category {
+                    data {
+                        attributes {
+                            name
+                        }
+                    }
+                }
                 author {
                   data {
                     attributes {
@@ -87,7 +99,7 @@ const getPostsBySearch = async (searchReq: string | null | undefined) => {
                 baseURL: "http://localhost:1337"
             });
 
-            return response.data.data.search.posts;
+            return response.data.data.search;
         } catch (error) {
             console.error('Ошибка при попытке поиска объявлений:', error);
         }
@@ -134,9 +146,11 @@ const updateFavoritesByUserAndPostId = async (postId: number, userIdentificator:
 
 export default {
     getPosts,
+    getPostByPostId,
     getCategories,
     getPostsByUserId,
     getFavoritesPostsByUserId,
+    getPostsByCategory,
     getPostsBySearch,
     updateFavoritesByUserAndPostId
 }

@@ -8,10 +8,11 @@ import {useTimeAgo} from "next-timeago";
 import {useUser} from "@clerk/clerk-react";
 import GlobalApi from "@/app/_utils/GlobalApi";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {SignedIn} from "@clerk/nextjs";
 
-function PostHorizontal({post, index}:{post:any, index:any}) {
+function PostHorizontal({post}:{post:any}) {
 
-    const {isSignedIn, isLoaded, user} = useUser()
+    const {isLoaded, user} = useUser()
     const [liked, setLiked] = useState(false)
 
     useEffect(() => {
@@ -19,7 +20,6 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
         if (user && post.attributes.users_favorites?.data[0]?.attributes.identificator === user?.id) {
             setLiked(true)
         }
-        console.log(post)
     }, [user, post])
 
     const {TimeAgo} = useTimeAgo()
@@ -29,9 +29,9 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
 
         for (let i = 1; i <= 5; i++) {
             if (i <= Math.round(rating)) {
-                stars.push(<Star size={12} className="fill-black"/>)
+                stars.push(<Star key={i} size={12} className="fill-black"/>)
             } else {
-                stars.push(<Star size={12} />)
+                stars.push(<Star key={i} size={12} />)
             }
         }
 
@@ -62,7 +62,7 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
 
     return (
         <Card className="w-full rounded-xl h-[200px]
-        transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50" key={index}>
+        transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50">
             <CardContent className="flex justify-between px-0 h-full">
                 <div className="flex h-full">
                     <div className="h-full relative w-64">
@@ -98,9 +98,11 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-between p-5">
-                    <Heart className={`cursor-pointer ${liked && "fill-black"}`}
-                           onClick={() => handleHeartClick(post.id, user?.id)}/>
-                    <div className="flex gap-2 items-center">
+                    <SignedIn>
+                        <Heart className={`cursor-pointer ${liked && "fill-black"}`}
+                               onClick={() => handleHeartClick(post.id, user?.id)}/>
+                    </SignedIn>
+                    <div className="flex gap-2 mt-auto items-center">
                         <Avatar className="border">
                             <AvatarImage src={post.attributes.author.data.attributes.profile_image_url}/>
                             <AvatarFallback>AV</AvatarFallback>
@@ -108,8 +110,7 @@ function PostHorizontal({post, index}:{post:any, index:any}) {
                         <div>
                             <p className="font-medium text-black">
                                 {post.attributes.author.data.attributes.first_name ??
-                                    post.attributes.author.data.attributes.username
-                                }
+                                    post.attributes.author.data.attributes.username}
                             </p>
                             <div className="flex items-center gap-1">
                                 <StarRating rating={4}/>

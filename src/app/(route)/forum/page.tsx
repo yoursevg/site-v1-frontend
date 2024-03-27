@@ -73,7 +73,7 @@ function Forum() {
                         </TableHeader>
                         <TableBody>
                             {data.map((forum, index) => (
-                                <TableRow>
+                                <TableRow key={index}>
                                     <TableCell className="font-medium">{forum.title}</TableCell>
                                     <TableCell>
                                         <TimeAgo date={forum.lastUpdate} locale='ru' />

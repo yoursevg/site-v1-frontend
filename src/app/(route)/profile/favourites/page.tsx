@@ -18,7 +18,7 @@ function Favorites() {
 
     const getPostsList = () => {
         GlobalApi.getFavoritesPostsByUserId(user?.id).then(res => {
-            setPosts(res.data.data)
+            setPosts(res?.data.data)
         })
     }
 
@@ -29,8 +29,7 @@ function Favorites() {
             <CardTitle className="mb-5">Избранные объявления</CardTitle>
             <div className="w-full flex flex-col gap-5">
                 {posts.length > 0 && posts.map((post, index) => {
-                    console.log(post)
-                    return <PostHorizontal post={post} index={index}/>})}
+                    return <PostHorizontal post={post} key={index}/>})}
             </div>
         </div>
     );

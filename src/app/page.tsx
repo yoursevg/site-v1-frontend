@@ -32,22 +32,30 @@ function Home() {
 
     const getPostsList = () => {
         GlobalApi.getPosts().then((res) => {
-            setPosts(res.data.data)
+            setPosts(res?.data.data)
         })
     }
 
     const getCategoriesList = () => {
         GlobalApi.getCategories().then((res) => {
-            setCategories(res.data.data)
+            setCategories(res?.data.data)
         });
     };
+
+    const handleCategoryClick = async (categoryName:string) => {
+        const res = await GlobalApi.getPostsByCategory(categoryName)
+        setPosts(res?.data.data)
+    }
 
     const handleSearch = async (event: { preventDefault: () => void; }) => {
         event.preventDefault(); // Prevent the form from reloading the page
         try {
             const res = await GlobalApi.getPostsBySearch(searchTerm)
-            console.log(res)
-            setPosts(res.data)
+            if (res?.data?.data) {
+                setPosts(res.data.data)
+            } else if (res?.posts?.data) {
+                setPosts(res.posts.data)
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -57,10 +65,10 @@ function Home() {
         <div>
             <Tabs defaultValue="lines" className="">
                 <div className="flex flex-wrap justify-between">
-                    {categories.length > 0 ? categories.map((category, index) => {
+                    {categories.length > 0 ? categories.map((category:any, index) => {
                             return <Card
                                 className="mx-4 pt-4 cursor-pointer hover:scale-110 hover:bg-gray-50 transition-all ease-linear"
-                                key={index}>
+                                key={index} onClick={() => handleCategoryClick(category.attributes.name)}>
                                 <CardContent className="flex flex-col items-center">
                                     <CardTitle className="text-lg">
                                         {category.attributes.name}
@@ -85,7 +93,7 @@ function Home() {
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Тип</SelectLabel>
-                                    {categories.length > 0 && categories.map((category, index) => {
+                                    {categories.length > 0 && categories.map((category:any, index) => {
                                         return <SelectItem value={category.attributes.name} key={index}>
                                             {category.attributes.name}
                                         </SelectItem>
@@ -100,9 +108,9 @@ function Home() {
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Сортировка</SelectLabel>
-                                    <SelectItem value="apple">Apple</SelectItem>
-                                    <SelectItem value="banana">Banana</SelectItem>
-                                    <SelectItem value="blueberry">Blueberry</SelectItem>
+                                    <SelectItem value="blueberry">По релевантности</SelectItem>
+                                    <SelectItem value="apple">Сначала новые</SelectItem>
+                                    <SelectItem value="banana">Сначала старые</SelectItem>
                                     <SelectItem value="grapes">Grapes</SelectItem>
                                     <SelectItem value="pineapple">Pineapple</SelectItem>
                                 </SelectGroup>
@@ -134,16 +142,16 @@ function Home() {
                 <TabsContent value="lines">
                     <div className="flex flex-col gap-5">
                         {posts.length > 0 ? posts.map((post, index) => {
-                            return <PostHorizontal post={post} index={index}/>
+                            return <PostHorizontal key={`horizontal_${index}`} post={post}/>
                         }) : [1, 2, 3].map((item, index) => (
                             <div className='h-[200px] w-full bg-slate-200
             rounded-lg animate-pulse' key={index}></div>))}
                     </div>
                 </TabsContent>
                 <TabsContent value="grid">
-                    <div className="flex gap-4 flex-wrap justify-between">
+                    <div className="flex gap-4 flex-wrap">
                         {posts.length > 0 && posts.map((post, index) => {
-                            return <PostVertical post={post} index={index}/>
+                            return <PostVertical post={post} key={`vertical_${index}`}/>
                         })}
                     </div>
                 </TabsContent>

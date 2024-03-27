@@ -7,7 +7,7 @@ import Footer from "@/app/_components/Footer";
 import {ClerkProvider} from "@clerk/nextjs";
 import {ruRU} from "@clerk/localizations";
 import React from "react";
-import { Suspense } from 'react'
+import {Toaster} from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +36,7 @@ export default function RootLayout({
                   {children}
                 </div>
               <Footer />
+              <Toaster />
           </ThemeProvider>
           </body>
         </html>

@@ -5,14 +5,14 @@ import {Calendar} from "lucide-react";
 import Link from "next/link";
 import {useTimeAgo} from "next-timeago";
 
-function PostVertical({post, index}:{post:any, index:any}) {
+function PostVertical({post}:{post:any}) {
 
     const {TimeAgo} = useTimeAgo()
 
     return (
         <Link href={`/posts?postId=${post.id}`}> <Card
             className="rounded-xl w-[300px] h-[400px]
-            transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50" key={index}>
+            transition duration-300 ease-in-out hover:shadow-lg hover:bg-opacity-50">
             <CardContent className="flex justify-between px-0">
                 <div className="flex flex-col w-full">
                     <div className="w-full h-48 relative">
