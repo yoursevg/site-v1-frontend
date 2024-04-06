@@ -17,7 +17,7 @@ function PostVertical({post}:{post:any}) {
                 <div className="flex flex-col w-full">
                     <div className="w-full h-48 relative">
                         <Image className="rounded-t-xl w-full h-full"
-                               src={post.attributes.images.data[0].attributes.url} alt="photo"
+                               src={post.attributes.images?.data[0].attributes.url} alt="photo"
                                layout="fill" objectFit="cover"/>
                     </div>
                     <div className="ml-3">

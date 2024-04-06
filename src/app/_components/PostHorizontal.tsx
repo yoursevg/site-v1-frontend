@@ -104,13 +104,13 @@ function PostHorizontal({post}:{post:any}) {
                     </SignedIn>
                     <div className="flex gap-2 mt-auto items-center">
                         <Avatar className="border">
-                            <AvatarImage src={post.attributes.author.data.attributes.profile_image_url}/>
+                            <AvatarImage src={post.attributes.author?.data?.attributes?.profile_image_url}/>
                             <AvatarFallback>AV</AvatarFallback>
                         </Avatar>
                         <div>
                             <p className="font-medium text-black">
-                                {post.attributes.author.data.attributes.first_name ??
-                                    post.attributes.author.data.attributes.username}
+                                {post.attributes.author?.data?.attributes.first_name ??
+                                    post.attributes.author?.data?.attributes.username}
                             </p>
                             <div className="flex items-center gap-1">
                                 <StarRating rating={4}/>
@@ -118,7 +118,7 @@ function PostHorizontal({post}:{post:any}) {
                             </div>
                             <span className="text-sm">
                                 зарегистрирован:{"\n"}
-                                <TimeAgo date={post.attributes.author.data.attributes.createdAt}
+                                <TimeAgo date={post.attributes.author?.data?.attributes.createdAt}
                                          locale='ru'/>
                             </span>
                         </div>

@@ -47,8 +47,11 @@
     "react-loader-spinner": "^6.1.6",
     "react-time-ago": "^7.3.1",
     "rsuite": "^5.56.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
+    "valibot": "^0.30.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

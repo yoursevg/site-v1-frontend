@@ -1,12 +1,7 @@
 import axios from "axios";
 
-const API_KEY=process.env.NEXT_PUBLIC_STRAPI_API
-
 const axiosClient = axios.create({
     baseURL: "http://localhost:1337/api",
-    headers: {
-        Authorization: `Bearer ${API_KEY}`
-    }
 })
 
 const getPosts = () =>axiosClient
@@ -15,7 +10,6 @@ const getPosts = () =>axiosClient
 const getPostByPostId = (postId: string | null | undefined) => axiosClient
     .get(`posts/${postId}?populate=*`)
     .catch(error => console.error('Ошибка при получении объявления:', error))
-
 const getCategories = () => axiosClient
     .get("categories?populate=*&sort=id")
     .catch(error => console.error('Ошибка при получении категорий:', error))
@@ -28,6 +22,29 @@ const getPostsByCategory = (categoryName: string | null | undefined) => axiosCli
 const getFavoritesPostsByUserId = (userId: string | null | undefined) => axiosClient
     .get(`posts?populate=*&filters[users_favorites][identificator][$eq]=${userId}`)
     .catch(error => console.error('Ошибка при получении объявлений:', error))
+const getUserIdByIdentificator = (identificator: string | undefined) => axiosClient
+    .get(`/users?populate=*&filters[identificator][$eq]=${identificator}`)
+    .catch(error => console.error('Ошибка при получении пользователя:', error))
+
+const uploadPhoto = (file: File | Blob) => {
+    const formData = new FormData();
+    formData.append('files', file); // file can no longer be undefined due to the function's type signature
+
+    return axiosClient.post("upload", formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data', // This header is often necessary for file uploads
+        },
+    });
+}
+const deletePhoto = (id: number) => axiosClient
+    .delete(`upload/files/${id}`)
+    .catch(error => console.error('Ошибка при получении объявлений:', error))
+const createPost = (newPost: any) => axiosClient
+    .post("posts", {
+        data: {...newPost}
+    })
+    .catch(error => console.error('Ошибка при создании объявления:', error))
+
 const getPostsBySearch = async (searchReq: string | null | undefined) => {
     if (searchReq === "") {
         return getPosts()
@@ -105,7 +122,6 @@ const getPostsBySearch = async (searchReq: string | null | undefined) => {
         }
     }
 };
-
 const updateFavoritesByUserAndPostId = async (postId: number, userIdentificator: string | null | undefined) => {
     try {
         const usersResponse = await axiosClient.get(`/users?filters[identificator][$eq]=${userIdentificator}`);
@@ -142,15 +158,72 @@ const updateFavoritesByUserAndPostId = async (postId: number, userIdentificator:
         console.error('Ошибка при обновлении списка избранных:', error);
     }
 };
+const findOrCreateRoom = async (userId: number, sellerId: number, token: string | null) => {
+    try {
+        let response = await axiosClient
+            .get(`/rooms?filters[$and][0][users]=${userId}&filters[$and][1][users]=${sellerId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
+        if (response.data.data.length > 0) {
+            // Если комната существует, возвращаем ее
+            return response.data.data[0];
+        }
+
+        // Если комната не найдена, создаем новую
+        response = await axiosClient.post("/rooms", {
+            data: {
+                users: [userId, sellerId],
+            },
+        });
+
+        // Возвращаем созданную комнату
+        return response.data.data;
+
+    } catch (error) {
+        console.error('Ошибка при попытке найти или создать комнату:', error);
+        throw error;
+    }
+};
+const getMessages = (roomId: number, token: string | null) => axiosClient
+    .get(`/messages?filters[room]=${roomId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .catch(error => console.error('Ошибка при получении сообщений:', error))
+
+const sendMessage = ({ roomId, content, senderId, token }) => axiosClient
+    .post(`/messages`, {
+        data: {
+            room: roomId, // ID комнаты, в которую отправляется сообщение
+            content: content, // Содержимое сообщения
+            sender: senderId, // ID отправителя сообщения
+        }
+    }, {
+        headers: {
+            'Authorization': `Bearer ${token}`, // Используйте токен для аутентификации запроса
+        }
+    })
+    .then(response => response.data) // Возможно, вы захотите обработать ответ сервера
+    .catch(error => console.error('Ошибка при отправке сообщения:', error));
 
 export default {
     getPosts,
     getPostByPostId,
     getCategories,
     getPostsByUserId,
+    uploadPhoto,
+    createPost,
+    deletePhoto,
     getFavoritesPostsByUserId,
     getPostsByCategory,
+    getUserIdByIdentificator,
     getPostsBySearch,
-    updateFavoritesByUserAndPostId
+    updateFavoritesByUserAndPostId,
+    findOrCreateRoom,
+    getMessages,
+    sendMessage
 }
