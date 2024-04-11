@@ -53,8 +53,8 @@ function News() {
     return (
         <div>
             <div className="flex flex-wrap justify-between">
-                {cards.map((card) => {
-                    return <Card className="w-[350px] py-2 cursor-pointer mb-7">
+                {cards.map((card, index) => {
+                    return <Card className="w-[350px] py-2 cursor-pointer mb-7" key={index}>
                         <CardContent className="py-2">
                             <CardTitle>
                                 {card.title}
