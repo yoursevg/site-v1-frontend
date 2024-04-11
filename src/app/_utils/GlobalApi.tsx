@@ -195,20 +195,20 @@ const getMessages = (roomId: number, token: string | null) => axiosClient
     })
     .catch(error => console.error('Ошибка при получении сообщений:', error))
 
-const sendMessage = ({ roomId, content, senderId, token }) => axiosClient
-    .post(`/messages`, {
-        data: {
-            room: roomId, // ID комнаты, в которую отправляется сообщение
-            content: content, // Содержимое сообщения
-            sender: senderId, // ID отправителя сообщения
-        }
-    }, {
-        headers: {
-            'Authorization': `Bearer ${token}`, // Используйте токен для аутентификации запроса
-        }
-    })
-    .then(response => response.data) // Возможно, вы захотите обработать ответ сервера
-    .catch(error => console.error('Ошибка при отправке сообщения:', error));
+// const sendMessage = ({ roomId, content, senderId, token }) => axiosClient
+//     .post(`/messages`, {
+//         data: {
+//             room: roomId, // ID комнаты, в которую отправляется сообщение
+//             content: content, // Содержимое сообщения
+//             sender: senderId, // ID отправителя сообщения
+//         }
+//     }, {
+//         headers: {
+//             'Authorization': `Bearer ${token}`, // Используйте токен для аутентификации запроса
+//         }
+//     })
+//     .then(response => response.data) // Возможно, вы захотите обработать ответ сервера
+//     .catch(error => console.error('Ошибка при отправке сообщения:', error));
 
 export default {
     getPosts,
@@ -225,5 +225,5 @@ export default {
     updateFavoritesByUserAndPostId,
     findOrCreateRoom,
     getMessages,
-    sendMessage
+    // sendMessage
 }
