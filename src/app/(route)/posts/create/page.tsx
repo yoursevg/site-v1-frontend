@@ -380,7 +380,7 @@
 
 "use client"
 import React, {useEffect, useState} from 'react';
-import ImageUploader from "@/app/_components/ImageUploader";
+// import ImageUploader from "@/app/_components/ImageUploader";
 import GlobalApi from "@/app/_utils/GlobalApi";
 import * as v from 'valibot';
 
@@ -407,7 +407,7 @@ const HomePage = () => {
     return (
         <div>
             <h1>Загрузка изображений</h1>
-            <ImageUploader />
+            {/*<ImageUploader />*/}
         </div>
     );
 };
